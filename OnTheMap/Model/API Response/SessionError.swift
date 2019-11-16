@@ -14,7 +14,7 @@ struct SessionError: Codable {
 }
 
 extension SessionError: LocalizedError {
-var errorDescription: String? {
-    return error
+    var errorDescription: String? {
+        return error
     }
 }

@@ -12,64 +12,48 @@ import MapKit
 
 class MapViewController: UIViewController, MKMapViewDelegate {
     
+    // MARK: Outlets
     @IBOutlet weak var mapView: MKMapView!
     
-    var studentLocation: [StudentLocation]! {
-        let object = UIApplication.shared.delegate
-        let appDelegate = object as! AppDelegate
-        return appDelegate.studentLocation
-    }
-    
+    // MARK: Override functions
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-                
-        UdacityClient.getStudentLocations { (response, error) in
+        
+        UdacityClient.getStudentLocations { (success, error) in
             if error != nil {
                 self.showFailure(message: error?.localizedDescription ?? "")
                 return
             }
-            guard let response = response else {
-                self.showFailure(message: "Sorry there is a problem with the data")
-                return
-            }
-            
-            let object = UIApplication.shared.delegate
-            let appDelegate = object as! AppDelegate
-            appDelegate.studentLocation.append(contentsOf: response.results)
-           
             var annotations = [MKPointAnnotation]()
-            for location in appDelegate.studentLocation {
-                        
-                        let lat = CLLocationDegrees(location.latitude)
-                        let long = CLLocationDegrees(location.longitude)
-                        
-                        let coordinate = CLLocationCoordinate2D(latitude: lat, longitude: long)
-                        
-                        let firstName = location.firstName
-                        let lastName = location.lastName
-                        let mediaURL = location.mediaURL
-                        
-                        let annotation = MKPointAnnotation()
-                        annotation.coordinate = coordinate
-                        annotation.title = "\(firstName) \(lastName)"
-                        annotation.subtitle = mediaURL
-                        
-                        annotations.append(annotation)
-                    }
-                    self.mapView.addAnnotations(annotations)
+            for location in StudentLocationData.sharedInstance.studentLocation {
+                
+                let lat = CLLocationDegrees(location.latitude)
+                let long = CLLocationDegrees(location.longitude)
+                
+                let coordinate = CLLocationCoordinate2D(latitude: lat, longitude: long)
+                
+                let firstName = location.firstName
+                let lastName = location.lastName
+                let mediaURL = location.mediaURL
+                
+                let annotation = MKPointAnnotation()
+                annotation.coordinate = coordinate
+                annotation.title = "\(firstName) \(lastName)"
+                annotation.subtitle = mediaURL
+                
+                annotations.append(annotation)
+            }
+            self.mapView.addAnnotations(annotations)
         }
     }
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-    }
     
+    // MARK: mapView Functions
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         
         let reuseId = "pin"
         
         var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseId) as? MKPinAnnotationView
-
+        
         if pinView == nil {
             pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
             pinView!.canShowCallout = true
@@ -88,16 +72,17 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             let app = UIApplication.shared
             if let toOpen = view.annotation?.subtitle! {
                 if let url = URL(string: toOpen) {
-                   app.open(url, options: [:]) { (success) in
-                       if !success {
-                           self.showFailure(message: "Invalid URL")
-                       }
-                   }
+                    app.open(url, options: [:]) { (success) in
+                        if !success {
+                            self.showFailure(message: "Invalid URL")
+                        }
+                    }
                 }
             }
         }
     }
     
+    // MARK: Custom functions
     func showFailure(message: String) {
         let alert = UIAlertController(title: "Alert", message: message, preferredStyle: .alert)
         let dismissAction = UIAlertAction(title: "OK", style: .default) { (action) in

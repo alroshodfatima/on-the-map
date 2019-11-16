@@ -25,6 +25,7 @@
 		4C2982E723735773001CF6BD /* UdacityClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C2982E623735773001CF6BD /* UdacityClient.swift */; };
 		4C2982E923737579001CF6BD /* SessionError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C2982E823737579001CF6BD /* SessionError.swift */; };
 		4C2982EB2374449A001CF6BD /* Credintials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C2982EA2374449A001CF6BD /* Credintials.swift */; };
+		4C5FDD9C23806322001F6E87 /* StudentLocationData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C5FDD9B23806322001F6E87 /* StudentLocationData.swift */; };
 		4CA4D67F23784A4E00B2C549 /* UIViewController+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA4D67E23784A4E00B2C549 /* UIViewController+Extension.swift */; };
 		4CCA9FF32378746F00E08BC6 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CCA9FF22378746E00E08BC6 /* User.swift */; };
 		4CCA9FF52378793F00E08BC6 /* PublicUserResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CCA9FF42378793F00E08BC6 /* PublicUserResponse.swift */; };
@@ -53,6 +54,7 @@
 		4C2982E623735773001CF6BD /* UdacityClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UdacityClient.swift; sourceTree = "<group>"; };
 		4C2982E823737579001CF6BD /* SessionError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionError.swift; sourceTree = "<group>"; };
 		4C2982EA2374449A001CF6BD /* Credintials.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Credintials.swift; sourceTree = "<group>"; };
+		4C5FDD9B23806322001F6E87 /* StudentLocationData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentLocationData.swift; sourceTree = "<group>"; };
 		4CA4D67E23784A4E00B2C549 /* UIViewController+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extension.swift"; sourceTree = "<group>"; };
 		4CCA9FF22378746E00E08BC6 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		4CCA9FF42378793F00E08BC6 /* PublicUserResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicUserResponse.swift; sourceTree = "<group>"; };
@@ -100,6 +102,7 @@
 				4C2982E423734762001CF6BD /* Account.swift */,
 				4C2982E223734641001CF6BD /* Session.swift */,
 				4C2982EA2374449A001CF6BD /* Credintials.swift */,
+				4C5FDD9B23806322001F6E87 /* StudentLocationData.swift */,
 			);
 			path = "API Request";
 			sourceTree = "<group>";
@@ -253,6 +256,7 @@
 				4C2982E523734762001CF6BD /* Account.swift in Sources */,
 				4C1DE132237DD66100FF0201 /* ListViewController.swift in Sources */,
 				4CFDFFF123799BDF008D7414 /* PostStudentLocationResponse.swift in Sources */,
+				4C5FDD9C23806322001F6E87 /* StudentLocationData.swift in Sources */,
 				4C2982DF2373452F001CF6BD /* Login.swift in Sources */,
 				4C2982DD2373425C001CF6BD /* StudentLocationResponse.swift in Sources */,
 				4C2982EB2374449A001CF6BD /* Credintials.swift in Sources */,

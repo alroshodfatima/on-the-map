@@ -10,5 +10,5 @@ import Foundation
 
 struct Account: Codable {
     let registered: Bool
-    let key: String // userID
+    let key: String
 }

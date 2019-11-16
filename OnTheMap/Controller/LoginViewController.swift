@@ -10,53 +10,60 @@ import UIKit
 
 class LoginViewController: UIViewController, UITextFieldDelegate {
     
-    
+    // MARK: Outlets
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
     @IBOutlet weak var loginButton: UIButton!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
-    
+    // MARK: Override functions
     override func viewDidLoad() {
         super.viewDidLoad()
         emailTextField.delegate = self
         passwordTextField.delegate = self
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+    // MARK: text field delegate methods
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        
+        return true
     }
     
     func textFieldDidBeginEditing(_ textField: UITextField) {
-            textField.text = ""
-    }
-
-
-    @IBAction func loginTapped(_ sender: Any) {
-        setLoggingIn(true)
-        UdacityClient.login(username: self.emailTextField.text ?? "", password: self.passwordTextField.text ?? "", completionHandler: self.handleLoginResponse(success:error:))
+        textField.text = ""
     }
     
+    // MARK: Actions
+    @IBAction func loginTapped(_ sender: Any) {
+        setLoggingIn(true)
+        UdacityClient.login(username: emailTextField.text ?? "", password: passwordTextField.text ?? "", completionHandler: handleLoginResponse(success:error:))
+    }
+    
+    @IBAction func signUpButtonClicked(_ sender: Any) {
+        let app = UIApplication.shared
+        if let url = URL(string: "https://www.udacity.com/account/auth#!/signup") {
+            app.open(url, options: [:], completionHandler: nil)
+        } else {
+            print("Error opening udacity URL")
+        }
+    }
+    
+    // MARK: Custom functions
     func handleLoginResponse(success: Bool, error: Error?){
-
+        
         setLoggingIn(false)
         if success{
-                self.performSegue(withIdentifier: "completeLogin", sender: nil)
+            performSegue(withIdentifier: "completeLogin", sender: nil)
         } else {
             showLoginFailure(message: error?.localizedDescription ?? "")
         }
-        
-        
         
     }
     
     func setLoggingIn(_ loggingIn: Bool){
         DispatchQueue.main.async {
-            if loggingIn {
-                self.activityIndicator.startAnimating()
-            } else {
-                self.activityIndicator.stopAnimating()
-            }
+            loggingIn ? self.activityIndicator.startAnimating() : self.activityIndicator.stopAnimating()
             self.emailTextField.isEnabled = !loggingIn
             self.passwordTextField.isEnabled = !loggingIn
             self.loginButton.isEnabled = !loggingIn
@@ -70,17 +77,5 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
             self.show(alertVC, sender: nil)
         }
     }
-    
-    
-    @IBAction func signUpButtonClicked(_ sender: Any) {
-        let app = UIApplication.shared
-        if let url = URL(string: "https://www.udacity.com/account/auth#!/signup") {
-            app.open(url, options: [:], completionHandler: nil)
-        } else {
-            print("Error opening udacity URL")
-        }
-    }
-    
-    
 }
 

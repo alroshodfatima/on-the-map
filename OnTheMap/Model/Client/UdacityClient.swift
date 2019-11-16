@@ -9,34 +9,34 @@
 import Foundation
 
 class UdacityClient {
-
-struct Auth {
-    static var sessionId = ""
-    static var userId = "" // Account Key == uniqueKey
-}
-
-enum Endpoints {
-    static let base = "https://onthemap-api.udacity.com/v1/"
     
-    case login
-    case logout
-    case publicUser
-    case studentLocation
+    struct Auth {
+        static var sessionId = ""
+        static var userId = "" // Account Key == uniqueKey
+    }
     
-    var stringValue: String {
-        switch self {
-        case .login: return Endpoints.base + "session"
-        case .logout: return Endpoints.base + "session"
-        case .publicUser: return Endpoints.base + "users/" + Auth.userId
-        case .studentLocation: return Endpoints.base + "StudentLocation?order=-updatedAt"
+    enum Endpoints {
+        static let base = "https://onthemap-api.udacity.com/v1/"
         
+        case login
+        case logout
+        case publicUser
+        case studentLocation
+        
+        var stringValue: String {
+            switch self {
+            case .login: return Endpoints.base + "session"
+            case .logout: return Endpoints.base + "session"
+            case .publicUser: return Endpoints.base + "users/" + Auth.userId
+            case .studentLocation: return Endpoints.base + "StudentLocation?order=-updatedAt&limit=100"
+                
+            }
+        }
+        
+        var url: URL {
+            return URL(string: stringValue)!
         }
     }
-    
-    var url: URL {
-        return URL(string: stringValue)!
-    }
-}
     
     enum ApiType: String {
         case udacity
@@ -72,7 +72,7 @@ enum Endpoints {
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Accept")
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-       request.httpBody = try! JSONEncoder().encode(body)
+        request.httpBody = try! JSONEncoder().encode(body)
         let session = URLSession.shared
         let task = session.dataTask(with: request) { data, response, error in
             if error != nil {
@@ -81,63 +81,63 @@ enum Endpoints {
                 }
                 return
             }
-          guard let data = data else {
+            guard let data = data else {
                 DispatchQueue.main.async {
                     completion(nil, error)
                 }
                 return
             }
-        var newData: Data
-        if apiType == ApiType.udacity{
-            newData = data.subdata(in: 5..<data.count) /* subset response data! */
-        } else {
-            newData = data
-        }
-            
-        let decoder = JSONDecoder()
-        do {
-            let json = try decoder.decode(ResponseType.self, from: newData)
-           DispatchQueue.main.async {
-               completion(json, nil)
-           }
-            
-        } catch {
-           do {
-               let errorResponse = try decoder.decode(SessionError.self, from: newData)
-               DispatchQueue.main.async {
-                   completion(nil, errorResponse)
-               }
-           }catch {
-            DispatchQueue.main.async {
-                completion(nil, error)
+            var newData: Data
+            if apiType == ApiType.udacity{
+                newData = data.subdata(in: 5..<data.count)
+            } else {
+                newData = data
             }
+            
+            let decoder = JSONDecoder()
+            do {
+                let json = try decoder.decode(ResponseType.self, from: newData)
+                DispatchQueue.main.async {
+                    completion(json, nil)
+                }
+                
+            } catch {
+                do {
+                    let errorResponse = try decoder.decode(SessionError.self, from: newData)
+                    DispatchQueue.main.async {
+                        completion(nil, errorResponse)
+                    }
+                }catch {
+                    DispatchQueue.main.async {
+                        completion(nil, error)
+                    }
+                }
             }
-           }
         }
         task.resume()
     }
     
     class func logout(completion: @escaping () -> Void) {
-
+        
         var request = URLRequest(url: Endpoints.logout.url)
         request.httpMethod = "DELETE"
         var xsrfCookie: HTTPCookie? = nil
         let sharedCookieStorage = HTTPCookieStorage.shared
         for cookie in sharedCookieStorage.cookies! {
-          if cookie.name == "XSRF-TOKEN" { xsrfCookie = cookie }
+            if cookie.name == "XSRF-TOKEN" { xsrfCookie = cookie }
         }
         if let xsrfCookie = xsrfCookie {
-          request.setValue(xsrfCookie.value, forHTTPHeaderField: "X-XSRF-TOKEN")
+            request.setValue(xsrfCookie.value, forHTTPHeaderField: "X-XSRF-TOKEN")
         }
         let session = URLSession.shared
         let task = session.dataTask(with: request) { data, response, error in
-          if error != nil { // Handle error…
-            completion()
-              return
-          }
+            if error != nil {
+                completion()
+                return
+            }
             
-         Auth.sessionId = ""
-         completion()
+            Auth.sessionId = ""
+            completion()
         }
         task.resume()
     }
@@ -163,25 +163,25 @@ enum Endpoints {
     }
     
     
-     class func taskForGETRequest<ResponseType: Decodable>(apiType: ApiType, url: URL, responseType: ResponseType.Type, completion: @escaping (ResponseType?, Error?) -> Void) {
+    class func taskForGETRequest<ResponseType: Decodable>(apiType: ApiType, url: URL, responseType: ResponseType.Type, completion: @escaping (ResponseType?, Error?) -> Void) {
         
         let request = URLRequest(url: url)
         let session = URLSession.shared
         let task = session.dataTask(with: request) { data, response, error in
-          if error != nil { // Handle error...
-            DispatchQueue.main.async {
-                completion(nil, error)
+            if error != nil {
+                DispatchQueue.main.async {
+                    completion(nil, error)
+                }
+                return
             }
-              return
-          }
             var newData: Data?
             if apiType == ApiType.udacity{
-                newData = data?.subdata(in: 5..<data!.count) /* subset response data! */
+                newData = data?.subdata(in: 5..<data!.count)
             } else {
                 newData = data
             }
-          
-           let decoder = JSONDecoder()
+            
+            let decoder = JSONDecoder()
             do {
                 let responseObject = try decoder.decode(ResponseType.self, from: newData!)
                 DispatchQueue.main.async {
@@ -194,22 +194,25 @@ enum Endpoints {
         task.resume()
     }
     
-    class func getStudentLocations(completion: @escaping (StudentLocationResponse?, Error?) -> Void){
+    class func getStudentLocations(completion: @escaping (Bool, Error?) -> Void){
         taskForGETRequest(apiType: ApiType.parse, url: Endpoints.studentLocation.url, responseType: StudentLocationResponse.self) { (response, error) in
             if error != nil {
                 DispatchQueue.main.async {
-                    completion(nil, error)
+                    completion(false, error)
                 }
                 return
             }
             guard let response = response else {
                 DispatchQueue.main.async {
-                    completion(nil, error)
+                    completion(false, error)
                 }
                 return
             }
+            if StudentLocationData.sharedInstance.studentLocation.count == 0 {
+                StudentLocationData.sharedInstance.studentLocation = response.results
+            }
             DispatchQueue.main.async {
-                completion(response, nil)
+                completion(true, nil)
             }
         }
     }
@@ -218,7 +221,6 @@ enum Endpoints {
         var request = URLRequest(url: Endpoints.studentLocation.url)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        
         
         // GETTING THE PUBLIC USER DATA
         getPublicUserData { (user, error) in
@@ -232,7 +234,7 @@ enum Endpoints {
                 DispatchQueue.main.async {
                     completion(nil, error)
                 }
-              return
+                return
             }
             
             var studentLocation = StudentLocation(objectId: "", uniqueKey: Auth.userId, firstName: user.firstName, lastName: user.lastName, mapString: location, mediaURL: mediaURL, latitude: latitude, longitude: longitude)
